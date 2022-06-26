@@ -1,0 +1,47 @@
+version: "3.8"
+
+networks:
+  database:
+    driver: bridge
+  front:
+    driver: bridge
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    networks:
+      - database
+
+  backend:
+    restart: always
+    build:
+      context: ./server-express
+      dockerfile: Dockerfile
+    volumes:
+      - ./server-express:/app
+    environment:
+      - SERVICE_NAME=backend
+      - CHOKIDAR_USEPOLLING=true
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    networks:
+      - database
+      - front
+
+  frontend:
+    restart: always
+    build:
+      context: ./client-angular
+      dockerfile: Dockerfile
+    expose:
+      - "4200"
+    ports:
+      - "8181:4200"
+    networks:
+      - front

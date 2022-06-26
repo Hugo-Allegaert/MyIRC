@@ -1,0 +1,70 @@
+<div class="d-flex" id="wrapper">
+
+  <!-- Sidebar -->
+  <div class="bg-light border-right" id="sidebar-wrapper">
+    <div class="sidebar-heading"><i class="fas fa-user-tie"></i>&nbsp;&nbsp;IRC - {{username}}</div>
+    <div class="list-group list-group-flush">
+        <li class="nav-item dropdown">
+          <a href="#roomSubmenu" data-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-light dropdown-toggle">Rooms</a>
+          <ul class="collapse list-unstyled" id="roomSubmenu">
+            <li *ngFor="let room of rooms" style="display: flex">
+              <a class="dropdown-item" href="#" (click)=switchRoom(room)>{{room}}</a>
+              <button class="btn" (click)="deleteRoom(room)" style="color: red"><i class="fa fa-trash"></i></button>
+            </li>
+            <div class="form-inline my-2 my-lg-0">
+              <input style="width: 70%;margin-left: 10px" [(ngModel)]="newroom" id="newroom" class="form-control mr-sm-2" type="search" placeholder="Ajouter une room" aria-label="Search">
+              <button class="btn" onclick="document.getElementById('newroom').value = ''" (click)="createRoom()"><i style="margin-left: 13px" class="fa fa-plus fa-1x"></i></button>
+            </div>
+          </ul>
+        </li>
+  </div>
+  <div class="list-group list-group-flush">
+    <li class="nav-item dropdown">
+      <a href="#userSubmenu" data-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-light dropdown-toggle">Utilisateurs</a>
+      <ul class="collapse list-unstyled" id="userSubmenu">
+        <li *ngFor="let user of users" style="display: flex">
+          <a class="dropdown-item" href="#" (click)=privateMsg(user)><i class="fas fa-circle" style="color: lawngreen"></i>&nbsp;&nbsp;{{user}}</a>
+          <button class="btn" (click)="addFriend(user)"><i class="fa fa-plus"></i></button>
+        </li>
+      </ul>
+    </li>
+  </div>
+    <div class="list-group list-group-flush">
+      <li class="nav-item dropdown">
+        <a href="#friendSubmenu" data-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-light dropdown-toggle">Amis</a>
+        <ul class="collapse list-unstyled" id="friendSubmenu">
+          <li *ngFor="let friend of friends" style="display: flex">
+            <a class="dropdown-item" href="#" (click)=privateMsg(friend)><i class="fas fa-circle" style="color: lawngreen"></i>&nbsp;&nbsp;{{friend}}</a>
+            <button class="btn" (click)="delFriend(friend)" style="color: red"><i class="fa fa-trash"></i></button>
+          </li>
+        </ul>
+      </li>
+    </div>
+  </div>
+
+  <div id="page-content-wrapper">
+    <!-- Chat Header -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="z-index: 10">
+  <a class="navbar-brand" href="#">Room - {{room}}</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+</nav>
+
+
+
+<!-- Chat section  -->
+<ol class="chat" #scrollMe [scrollTop]="scrollMe.scrollHeight" *ngIf="messages.length > 0">
+  <li [ngClass]="{'self': message.userMe == 0 , 'other': message.userMe == 2, 'server': message.userMe == 1}" *ngFor="let message of messages">
+    <div class="msg">
+      <div class="user">{{ message.username }}</div>
+      <p> {{ message.message }} </p>
+      <time>{{ message.time }}</time>
+    </div>
+  </li>
+</ol>
+
+<!-- Chat Sending  -->
+<textarea [(ngModel)]="message" #msginput (keydown.enter)="sendMessage();msginput.value='';" style="color: black" placeholder="Dit quelque chose ..."></textarea>
+</div>
+</div>

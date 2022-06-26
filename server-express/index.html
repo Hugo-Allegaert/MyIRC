@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Mon super IRC :D</title>
+    <style>
+        .container {
+            display: flex;
+        }
+        
+        .divL,
+        .divR {
+            box-sizing: border-box;
+            padding: 10px;
+        }
+        
+        .divL {
+            background: #ffe9c6;
+            border-right: 1px solid black;
+            /* 
+        width: 40% */
+        }
+        
+        .divR {
+            background: #ffdad8;
+            /* 
+        width: 60% */
+        }
+    </style>
+</head>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script>
+    var socket = io.connect('http://localhost:8080');
+
+    socket.on('connect', function() {
+
+        var username = prompt("Whath is your name ?");
+
+        // Change title
+        document.title = username + ' - ' + 'General';
+
+        //Update userlist in server
+        socket.emit('add_user', username);
+    });
+
+    socket.on('update_chat', function(username, data) {
+        $('#conversation').append('<b>' + username + ':</b> ' + data + '<br>');
+    });
+
+    socket.on('update_chat_maj', function(data, clear) {
+        //console.log(data);
+        $('#conversation').empty();
+
+        $.each(data, function(key, value) {
+            $('#conversation').append('<b>' + value['user'] + ':</b> ' + value['message'] + '<br>');
+        });
+    });
+
+
+    socket.on('update_rooms', function(rooms, current_room) {
+        $('#rooms').empty();
+        if (current_room == '') {
+            current_room = socket.room;
+        }
+
+        if (rooms.includes(current_room) != true) {
+            switch_room(rooms[0]);
+            alert('Room ddoes not exist, you move to General')
+        }
+
+        $.each(rooms, function(key, value) {
+            if (value == current_room) {
+                $('#rooms').append('<div>' + value + '</div>');
+            } else {
+                $('#rooms').append('<div><a href="#" onclick="switch_room(\'' + value + '\')">' + value + '</a></div>');
+            }
+        });
+    });
+
+    function switch_room(room) {
+        socket.emit('switch_room', room);
+    }
+
+    $(function() {
+        $('#send').click(function() {
+            var message = $('#data').val();
+            $('#data').val('');
+            if (message != '') {
+                document.getElementById("data").style.backgroundColor = "#ffffff";
+                if (message[0] == '@') {
+                    var fields = message.split(' ');
+
+                    var name = message.split(/ (.+)/)[0].substr(1);
+
+                    var message = message.split(/ (.+)/)[1];
+                    socket.emit('private_message', name, message);
+                } else {
+                    socket.emit('sendchat', message);
+                }
+            } else {
+                document.getElementById("data").style.backgroundColor = "#ff0000";
+            }
+        });
+
+        $('#data').keypress(function(e) {
+            if (e.which == 13) {
+                $(this).blur();
+                $('#send').focus().click();
+            }
+        });
+
+        $('#add_room').click(function() {
+            var message = $('#channel_name').val();
+            $('#channel_name').val('');
+            if (message != '') {
+                document.getElementById("channel_name").style.backgroundColor = "#ffffff";
+                socket.emit('add_rooms', message);
+            } else {
+                document.getElementById("channel_name").style.backgroundColor = "#ff0000";
+            }
+        });
+
+        $('#remove_room').click(function() {
+            var message = $('#channel_name').val();
+            $('#channel_name').val('');
+            if (message != '') {
+                document.getElementById("channel_name").style.backgroundColor = "#ffffff";
+                socket.emit('remove_rooms', message);
+            } else {
+                document.getElementById("channel_name").style.backgroundColor = "#ff0000";
+            }
+        });
+    });
+</script>
+
+<body>
+    <div class="container">
+        <div class="divL">
+            <b>Rooms list:</b>
+            <div id="rooms"></div>
+            <div id="pv_room"></div>
+            <input type="button" id="add_room" value="add_room" />
+            <input id="channel_name" />
+            <input type="button" id="remove_room" value="remove_room" />
+        </div>
+        <div class="divR">
+            <div id="conversation"></div>
+            <input id="data" style="width:200px;" />
+            <input type="button" id="send" value="send" />
+        </div>
+    </div>
+</body>
+
+</html>

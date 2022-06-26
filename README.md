@@ -21,7 +21,7 @@ Launch the project using docker :
 $> docker-compose up --build
 ```
 
-> visit IRC app on : http://localhost:8181
+> visit IRC app on : http://localhost:8181  
 > visit NodeJs server on : http://localhost:8080
 
 # Result overview

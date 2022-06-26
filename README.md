@@ -1,6 +1,6 @@
 # Description
 
-The objective was to made an IRC app made using NodeJs Express server and Angular client.  
+The objective was to made an IRC app, using NodeJs Express server and Angular client.  
 You have the possibilty to :
 * Add / Delete room
 * Join room

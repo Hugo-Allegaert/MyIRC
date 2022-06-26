@@ -1,0 +1,2 @@
+# MyIRC
+NodeJs + Angular IRC
